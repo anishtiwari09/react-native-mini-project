@@ -1,9 +1,10 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import TodoInput from './todo-input';
 import { IAction, IActionType, TodoListType } from '../utility/types';
 import TodoList from './todo-list';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+const STORE_DB = 'store-todo-value';
 const reducer = (state: TodoListType[], action: IAction): TodoListType[] => {
   switch (action.type) {
     case IActionType.add: {
@@ -11,11 +12,20 @@ const reducer = (state: TodoListType[], action: IAction): TodoListType[] => {
         ...state,
         {
           name: action.payload.name,
-          id: Date.now(),
+          id: action.payload.id,
           isActive: true,
           date: Date.now(),
         },
       ];
+    }
+    case IActionType.delete: {
+      const selectedId = action.payload?.id;
+      return state.filter(item => item.id !== selectedId);
+    }
+
+    case IActionType.restoreValue: {
+      const initialValue = action.payload.initialValue || [];
+      return [...initialValue];
     }
     default:
       return state;
@@ -23,19 +33,56 @@ const reducer = (state: TodoListType[], action: IAction): TodoListType[] => {
 };
 export default function Todo() {
   const [state, dispatch] = useReducer(reducer, []);
-  const handleAddToList = (text: string) => {
+  const handleAddList = (text: string) => {
     dispatch({
       type: IActionType.add,
       payload: {
         name: text,
+        id: Date.now(),
       },
     });
   };
+
+  const handleDeleteFromList = (id: number) => {
+    dispatch({
+      type: IActionType.delete,
+      payload: {
+        id: id,
+        name: '',
+      },
+    });
+  };
+
+  const handleInitilizeValue = async () => {
+    const todoValue = await AsyncStorage.getItem(STORE_DB);
+    const jsonValue = JSON.parse(todoValue || '[]');
+
+    dispatch({
+      type: IActionType.restoreValue,
+      payload: { name: '', id: 2, initialValue: jsonValue },
+    });
+  };
+  const saveToStorage = async (data: TodoListType[]) => {
+    console.log('storing');
+    try {
+      await AsyncStorage.setItem(STORE_DB, JSON.stringify(data));
+    } catch (error) {
+      console.error('Failed to store data', error);
+    }
+  };
+  useEffect(() => {
+    handleInitilizeValue();
+  }, []);
+
+  useEffect(() => {
+    saveToStorage(state);
+  }, [state]);
+
   return (
     <View style={styles.container}>
       <Text style={[styles.title]}>Todo List</Text>
-      <TodoInput handleAdd={handleAddToList} />
-      <TodoList datas={state} />
+      <TodoInput handleAdd={handleAddList} />
+      <TodoList datas={state} handleDelete={handleDeleteFromList} />
     </View>
   );
 }

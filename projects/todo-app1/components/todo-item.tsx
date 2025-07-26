@@ -1,20 +1,26 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { TodoListType } from '../utility/types';
+import { TextInput } from 'react-native/';
 
 export default function TodoItem({
   data,
   index,
+  handleDelete,
 }: {
   index: number;
   data: TodoListType;
+  handleDelete: () => void;
 }) {
   return (
     <View style={[styles.container]}>
       <Text style={styles.index}>{index}</Text>
-      <Text style={[styles.todoText]}>{data.name}</Text>
+      <TextInput style={[styles.todoText]} defaultValue={data.name} />
       <Text style={[styles.status]}>
         {data?.isActive ? 'Active' : 'Inactive'}
       </Text>
+      <TouchableOpacity onPress={handleDelete}>
+        <Text style={[styles.status]}>Delete</Text>
+      </TouchableOpacity>
     </View>
   );
 }
