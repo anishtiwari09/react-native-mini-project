@@ -1,12 +1,8 @@
 import React from 'react';
-import { TodoListType } from '../utility/types';
+import { TodoListProps, TodoListType } from '../utility/types';
 import { Text, View, StyleSheet, ScrollView } from 'react-native';
 import TodoItem from './todo-item';
 
-interface TodoListProps {
-  datas: TodoListType[];
-  handleDelete: (val: number) => void;
-}
 export default function TodoList({ datas, handleDelete }: TodoListProps) {
   if (!datas.length) return null;
 

@@ -21,3 +21,8 @@ export interface IAction {
   type: IActionType;
   payload: IPayload;
 }
+
+export interface TodoListProps {
+  datas: TodoListType[];
+  handleDelete: (val: number) => void;
+}

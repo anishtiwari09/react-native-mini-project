@@ -2,8 +2,8 @@ import React, { useEffect, useReducer } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import TodoInput from './todo-input';
 import { IAction, IActionType, TodoListType } from '../utility/types';
-import TodoList from './todo-list';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import TodoFlatList from './flatlist-todolist';
 const STORE_DB = 'store-todo-value';
 const reducer = (state: TodoListType[], action: IAction): TodoListType[] => {
   switch (action.type) {
@@ -82,7 +82,7 @@ export default function Todo() {
     <View style={styles.container}>
       <Text style={[styles.title]}>Todo List</Text>
       <TodoInput handleAdd={handleAddList} />
-      <TodoList datas={state} handleDelete={handleDeleteFromList} />
+      <TodoFlatList datas={state} handleDelete={handleDeleteFromList} />
     </View>
   );
 }
